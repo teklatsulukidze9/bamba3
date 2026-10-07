@@ -67,7 +67,7 @@ const search = document.getElementById("menuSearch");
 function showMenu(items) {
   grid.innerHTML = items.map(item => `
     <article class="menu-card">
-      <img src="${item.i || item.img || ''}" alt="${item.e || item.n || 'Bamba'}">
+   <img src="${item.img || ''}" alt="${item.e || item.n || 'Bamba'}">
       <div class="menu-card-content">
         <h3>${item.e || item.n || ''}</h3>
         <p>${item.n || ''}</p>
