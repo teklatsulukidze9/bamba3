@@ -12,7 +12,7 @@ async function loadMenu(){
   try{
     const r=await fetch(`${API}/menu`);
     const data=await r.json();
-    const valid=Array.isArray(data)?data.filter(x=>x&&x.n&&!/^n\s*\d+$/i.test(x.n)): [];
+    const valid=Array.isArray(data)?data.filter(x=>x&&x.n&&!/^n\s*\d+$/i.test(x.n)).map(x=>({...x,id:x.id||x.menu})): [];
     if(valid.length)MENU=valid;
   }catch{}
 }
@@ -263,4 +263,11 @@ const user = JSON.parse(
     initCart();
   });
 };
-
+document.addEventListener('DOMContentLoaded', () => {
+  updateCounts();
+  initBamba();
+  initCart();
+  initFav();
+  const f = document.querySelector('footer .container');
+  if (f) f.insertAdjacentHTML('beforeend', '<p><a href="admin-login.html" style="text-decoration:underline">Admin Dashboard</a></p>');
+});

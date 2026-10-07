@@ -1,95 +1,52 @@
-<!DOCTYPE html>
-<html lang="ka">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bamba • მენიუ</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header>
-  <div class="nav-container">
-    <a href="index.html" class="logo">Bamba <span>•</span></a>
-
-    <button class="burger" id="burgerBtn">☰</button>
-
-    <nav id="navMenu">
-      <a href="index.html">მთავარი</a>
-      <a href="menu.html" class="active">მენიუ</a>
-      <a href="cart.html">კალათა (<span id="cartCount">0</span>)</a>
-      <a href="favorite.html">ფავორიტები (<span id="favCount">0</span>)</a>
-      <a href="contactus.html" class="contact-link">კონტაქტი</a>
-      <a href="auth.html" id="authLink">შესვლა</a>
-    </nav>
-
-    <button id="themeToggle" class="theme-btn">🌙</button>
-  </div>
-</header>
-
-<main class="container page">
-
-  <div class="page-head">
-    <span class="eyebrow">BAMBA</span>
-    <h1>ჩვენი მენიუ</h1>
-    <p class="muted">აღმოაჩინე Bamba-ს საყვარელი კერძები.</p>
-  </div>
-
-  <div id="bcats" class="category-filters"></div>
-
-  <div class="search-box">
-    <input
-      type="search"
-      id="menuSearch"
-      placeholder="მოძებნე კერძი..."
-    >
-  </div>
-
-  <section id="menuGrid" class="grid"></section>
-
-</main>
-
-<footer>
-  <div class="container">
-    <strong>Bamba</strong>
-    <p>კლასიკური გემოები და თანამედროვე კომფორტი.</p>
-    <small>© 2026 Bamba Restaurant</small>
-  </div>
-</footer>
-
-<script src="bamba-data.js"></script>
-
+<!DOCTYPE html><html lang="ka"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bamba • მენიუ</title><link rel="stylesheet" href="style.css">
+<style>
+.ov{position:fixed;inset:0;background:#000a;z-index:100;display:none;place-items:center;padding:16px;overflow:auto}
+.ov.show{display:grid}
+.box{position:relative;background:var(--paper);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:26px;width:min(480px,100%)}
+.x{position:absolute;right:12px;top:6px;background:none;border:0;font-size:28px;color:var(--dark)}
+#cartPanel{position:fixed;top:0;right:0;height:100%;width:min(400px,100%);background:var(--paper);color:var(--text);z-index:90;box-shadow:-10px 0 30px #0005;transform:translateX(105%);transition:.25s;display:flex;flex-direction:column;padding:18px}
+#cartPanel.open{transform:none}
+.ci{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.ci button{border:1px solid var(--line);background:var(--cream);color:var(--dark);border-radius:6px;padding:2px 9px}
+.err{color:#9d493e;margin:6px 0}
+.sec{background:var(--cream);border-radius:10px;padding:12px;margin:10px 0;font-size:14px}
+.chip{border:1px solid var(--line);background:var(--paper);color:var(--dark);padding:9px 15px;border-radius:30px}
+.chip:hover,.chip.active{background:var(--dark);color:#fff}
+</style></head><body>
+<header><div class="nav-container"><a href="index.html" class="logo">Bamba <span>•</span></a><button class="burger" id="burgerBtn">☰</button><nav id="navMenu"><a href="index.html">მთავარი</a><a href="menu.html" class="active">მენიუ</a><a href="cart.html">კალათა (<span id="cartCount">0</span>)</a><a href="favorite.html">ფავორიტები (<span id="favCount">0</span>)</a><a href="contactus.html" class="contact-link">კონტაქტი</a><a href="auth.html" id="authLink">შესვლა</a></nav><button id="themeToggle" class="theme-btn">🌙</button></div></header>
+<main class="container page"><div class="section-head"><span>OUR MENU</span><h1>ჩვენი მენიუ</h1><p>აირჩიე შენი საყვარელი გემო.</p></div>
+<div class="menu-tools"><input id="q" placeholder="🔎 მოძებნე კერძი..."><div id="bcats" class="filter-bar"></div></div>
+<div id="menuGrid" class="cards-grid"></div></main>
+<footer><div class="container"><strong>Bamba</strong><p>კლასიკური გემოები და თანამედროვე კომფორტი.</p><small>© 2026 Bamba Restaurant</small><p><a href="admin-login.html" style="text-decoration:underline">Admin Dashboard</a></p></div></footer>
+<div id="cartPanel"><button class="x" onclick="closeCart()">×</button><h2>კალათა</h2><div id="cartBody" style="flex:1;overflow:auto"></div><h3>სულ: <span id="cartTotal">0.00</span> ₾</h3><button class="btn-main" onclick="checkout()">შეკვეთის გაფორმება</button></div>
+<div class="ov" id="ov"></div>
 <script>
-const grid = document.getElementById("menuGrid");
-const search = document.getElementById("menuSearch");
-
-function showMenu(items) {
-  grid.innerHTML = items.map(item => `
-    <article class="menu-card">
-   <img src="${item.img || ''}" alt="${item.e || item.n || 'Bamba'}">
-      <div class="menu-card-content">
-        <h3>${item.e || item.n || ''}</h3>
-        <p>${item.n || ''}</p>
-        <strong>${item.p || 0} ₾</strong>
-      </div>
-    </article>
-  `).join("");
+const M=[{"id": 1, "n": "ჩიზბურგერი", "e": "Cheeseburger", "c": "burger", "p": 14.5, "i": "საქონლის ხორცი, ჩედარი, ყველის სოუსი, მწნილი", "img": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500"}, {"id": 2, "n": "დაბლ ჩიზბურგერი", "e": "Double Cheeseburger", "c": "burger", "p": 18.5, "i": "ორმაგი საქონლის ხორცი, ორმაგი ჩედარი, სპეციალური სოუსი", "img": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500"}, {"id": 3, "n": "ბეკონის ბურგერი", "h": 1, "e": "Bacon Burger", "c": "burger", "p": 17, "i": "საქონლის ხორცი, ხრაშუნა ბეკონი, BBQ სოუსი, ხახვი", "img": "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=500"}, {"id": 4, "n": "ქათმის ბურგერი", "e": "Chicken Burger", "c": "burger", "p": 13.5, "i": "ხრაშუნა ქათმის ფილე, სალათის ფოთოლი, მაიონეზი", "img": "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=500"}, {"id": 5, "n": "მექსიკური ბურგერი", "h": 3, "e": "Spicy Mexican Burger", "c": "burger", "p": 16, "i": "საქონლის ხორცი, ხალაპენიო, ცხარე სოუსი, ნაჩოსი", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfwNT3YWcavmNVKuE9OrqXy57EfYiLHrimn386pE22mQ&s=10"}, {"id": 6, "n": "ვეგანური ბურგერი", "e": "Vegan Burger", "c": "burger", "p": 15, "i": "მცენარეული კოტლეტი, ავოკადო, პომიდორი, ვეგანური სოუსი", "img": "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=500"}, {"id": 7, "n": "პეპერონი", "h": 1, "e": "Pepperoni Pizza", "c": "pizza", "p": 22, "i": "მოცარელა, პეპერონი, ტომატის სოუსი", "img": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=500"}, {"id": 8, "n": "მარგარიტა", "e": "Margarita Pizza", "c": "pizza", "p": 17, "i": "მოცარელა, ტომატის სოუსი, ბაზილიკი", "img": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=500"}, {"id": 9, "n": "ოთხი ყველი", "h": 0, "e": "Quattro Formaggi", "c": "pizza", "p": 24, "i": "მოცარელა, დორბლუ, პარმეზანი, ჩედარი", "img": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500"}, {"id": 10, "n": "BBQ ქათმის პიცა", "h": 1, "e": "BBQ Chicken Pizza", "c": "pizza", "p": 23, "i": "ქათმის ფილე, BBQ სოუსი, წითელი ხახვი, სიმინდი", "img": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500"}, {"id": 11, "n": "პროშუტო & რუკოლა", "e": "Prosciutto & Arugula", "c": "pizza", "p": 26, "i": "პროშუტო, რუკოლა, პარმეზანი, ბალზამიკო", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS-Ev9JDoMvq6iGxlQLkv6dt4nepMDvCMKkF36HFNuVA&s=10"}, {"id": 12, "n": "სოკოს პიცა", "e": "Mushroom Pizza", "c": "pizza", "p": 20, "i": "შამპინიონი, თეთრი სოუსი, ნივრიანი ზეთი, მოცარელა", "img": "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=500"}, {"id": 13, "n": "აჭარული ხაჭაპური", "e": "Adjaruli Khachapuri", "c": "khachapuri", "p": 16, "i": "იმერული ყველი, სულგუნი, კარაქი, კვერცხი", "img": "https://ma-gari.ge/wp-content/uploads/2021/09/hachapuri-po-adzharski.jpg"}, {"id": 14, "n": "იმერული ხაჭაპური", "e": "Imeruli Khachapuri", "c": "khachapuri", "p": 14, "i": "ტრადიციული იმერული ყველი, თხელი ცომი", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQkBNSbmn_f5CH6qS3cgusPpcpvNe0bMh5C0FdI_OyDq9WzxLVPVf2ry6l&s=10"}, {"id": 15, "n": "მეგრული ხაჭაპური", "e": "Megruli Khachapuri", "c": "khachapuri", "p": 18, "i": "ორმაგი ყველი (შიგნით და ზემოდან მობრაწული)", "img": "https://gemrielia.ge/media/images/d7448a42790f42968152ec243b8e3d71.jpg"}, {"id": 16, "n": "ლობიანი", "h": 0, "e": "Lobiani", "c": "khachapuri", "p": 10, "i": "სანელებლებით შეზავებული ლობიო, თხელი ცომი", "img": "https://kulinaria.ge/media/recipe-images/2017/02/lobiani.jpg"}, {"id": 17, "n": "რაჭული ლობიანი (ლორით)", "h": 0, "e": "Rachuli Lobiani", "c": "khachapuri", "p": 15, "i": "ლობიო რაჭული ლორით", "img": "https://gemrielia.ge/media/images/50905754_289663541748931_5195439139868114944_n.jpg"}, {"id": 18, "n": "კუბდარი", "e": "Kubdari", "c": "khachapuri", "p": 17, "i": "სვანური სანელებლებით შეზავებული ხორცი", "img": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVBujs6mTnOew7GRhKZmJpY4hr4SDMjEMZt8BCMxfXcqKOMh0Qx4CtU3I&s=10"}, {"id": 19, "n": "ცივი ყავა", "e": "Iced Coffee", "c": "drinks", "p": 7, "i": "ესპრესო, რძე, ყინული, ნაყინი", "img": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=500"}, {"id": 20, "n": "კოკა-კოლა 0.5ლ", "e": "Coca-Cola", "c": "drinks", "p": 3.5, "i": "გაციებული გაზიანი სასმელი", "img": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500"}, {"id": 21, "n": "ფორთოხლის ფრეში", "e": "Fresh Orange Juice", "c": "drinks", "p": 8.5, "i": "100% ნატურალური ახლადდაწურული ფორთოხალი", "img": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=500"}, {"id": 22, "n": "კენკრის სმუზი", "e": "berry Smoothie", "c": "drinks", "p": 9, "i": "კენკრა, ბანანი, იოგურტი, ყინული", "img": "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=500"}, {"id": 23, "n": "ჩვენი ლიმონათი", "e": "Homemade Lemonade", "c": "drinks", "p": 6.5, "i": "ლიმონი, პიტნა, გაზიანი წყალი", "img": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500"}, {"id": 24, "n": "კაპუჩინო", "e": "Cappuccino", "c": "drinks", "p": 6, "i": "ესპრესო, ათქვეფილი რძის ქაფი", "img": "https://www.acouplecooks.com/wp-content/uploads/2020/10/how-to-make-cappuccino-005.jpg"}, {"id": 25, "n": "ჩიზქეიქი", "e": "Cheesecake", "c": "dessert", "p": 11, "i": "ნიუ-იორკ სტილის ჩიზქეიქი კენკრის სოუსით", "img": "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500"}, {"id": 26, "n": "ტირამისუ", "e": "Tiramisu", "c": "dessert", "p": 12, "i": "იტალიური დესერტი მასკარპონეთი და ყავით", "img": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500"}, {"id": 27, "n": "შოკოლადის ფონდანტი", "e": "Chocolate Fondant", "c": "dessert", "p": 10.5, "i": "ცხელი შოკოლადის ნამცხვარი ვანილის ნაყინთან ერთად", "img": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500"}, {"id": 28, "n": "ბლინები თაფლით", "e": "Pancakes with honey", "c": "dessert", "p": 9.5, "i": "ამერიკული ბლინები, თაფლი, ბანანი, მარწყვი", "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500"}, {"id": 29, "n": "ვაფლი ნაყინით", "e": "Waffle with Ice Cream", "c": "dessert", "p": 10, "i": "ბელგიური ვაფლი, ვანილის ნაყინი, კარამელის სოუსი", "img": "https://hillstreetgrocer.com/application/files/7415/4295/3234/waffles_with_valhalla_ice_cream.jpg"}, {"id": 30, "n": "ხილის ასორტი", "e": "Fruit Platter", "c": "dessert", "p": 15, "i": "სეზონური ახალი ხილის ნაკრები", "img": "https://popmenucloud.com/cdn-cgi/image/width%3D1200%2Cheight%3D1200%2Cfit%3Dscale-down%2Cformat%3Dauto%2Cquality%3D60/rovdpauc/3622dee4-abd4-4576-a584-1b686e3c5b3d.jpg"}];
+const CATS={burger:"🍔 ბურგერები",pizza:"🍕 პიცა",khachapuri:"🧀 ხაჭაპური",drinks:"🥤 სასმელები",dessert:"🍰 დესერტი"};
+const HEAT=["","🌶 ნაკლებად ცხარე","🌶🌶 საშუალო","🌶🌶🌶 ცხარე"];
+const $=s=>document.querySelector(s);
+const J=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||d)}catch(e){return JSON.parse(d)}};
+const cart=()=>J("bcart","{}"),favs=()=>J("bfav","[]");
+const save=c=>localStorage.setItem("bcart",JSON.stringify(c));
+const PH=/^[+]?[0-9 ()-]{9,20}$/,EM=/^[^ @]+@[^ @]+[.][^ @]+$/;
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+let cat="",favOnly=false,pending=false;
+function user(){const u=J("customer","null");return u&&u.name&&u.lastName&&PH.test(u.phone||"")&&EM.test(u.email||"")?u:null}
+function counts(){$("#cartCount").textContent=Object.values(cart()).reduce((a,b)=>a+b,0);$("#favCount").textContent=favs().length;const u=user();$("#authLink").textContent=u?"👤 "+u.name:"შესვლა"}
+function draw(){
+  const q=$("#q").value.toLowerCase().trim(),f=favs();
+  const list=M.filter(d=>(!cat||d.c===cat)&&(!favOnly||f.includes(d.id))&&(d.n+" "+(d.e||"")+" "+(d.i||"")).toLowerCase().includes(q));
+  $("#menuGrid").innerHTML=list.map(d=>`<article class="card"><div class="card-img-wrap"><button class="fav-btn" onclick="fav(${d.id})">${f.includes(d.id)?"♥":"♡"}</button><img src="${d.img}" alt="${d.n}" onerror="this.style.display='none'"></div><div class="card-content"><h3>${d.n}</h3><small>${d.e||""}</small>${d.h?`<div class="heat">${HEAT[d.h]}</div>`:""}<p>${d.i||""}</p><div class="card-bottom"><strong>${Number(d.p).toFixed(2)} ₾</strong><button class="btn-main" onclick="add(${d.id})">კალათაში</button></div></div></article>`).join("")||`<div class="empty-state">კერძი ვერ მოიძებნა</div>`;
 }
-
-showMenu(typeof BMENU !== "undefined" ? BMENU : []);
-
-search.addEventListener("input", () => {
-  const q = search.value.toLowerCase().trim();
-
-  const filtered = BMENU.filter(item =>
-    (item.e || "").toLowerCase().includes(q) ||
-    (item.n || "").toLowerCase().includes(q)
-  );
-
-  showMenu(filtered);
-});
+function fav(id){const f=favs();localStorage.setItem("bfav",JSON.stringify(f.includes(id)?f.filter(x=>x!==id):[...f,id]));counts();draw()}
+function add(id){const c=cart();c[id]=(c[id]||0)+1;save(c);counts();drawCart();openCart()}
+function qty(id,n){const c=cart();if(n<1)delete c[id];else c[id]=Math.max(0,n);save(c);counts();drawCart();draw()}
+function openCart(){const p=document.getElementById("cartPanel");if(p)p.classList.add("open")}
+function closeCart(){const p=document.getElementById("cartPanel");if(p)p.classList.remove("open")}
+function money(v){return Number(v||0).toFixed(2)}
+function cartTotalValue(){return Object.entries(cart()).reduce((sum,[id,q])=>{const item=M.find(x=>String(x.id)===String(id));return sum + (item ? item.p * Number(q) : 0);},0)}
+function drawCart(){const body=document.getElementById("cartBody");const total=document.getElementById("cartTotal");const items=Object.entries(cart());if(!items.length){body.innerHTML='<div class="empty-state">კალათა ცარიელია</div>';total.textContent='0.00';return}body.innerHTML=items.map(([id,q])=>{const d=M.find(x=>String(x.id)===String(id));if(!d)return '';return `<div class="ci"><div><strong>${esc(d.n)}</strong><br><small>${money(d.p)} ₾</small></div><div style="display:flex;align-items:center;gap:8px"><button onclick="qty(${d.id},${Number(q)-1})">−</button><span>${q}</span><button onclick="qty(${d.id},${Number(q)+1})">+</button></div></div>`}).join('');total.textContent=money(cartTotalValue())}
+function checkout(){const items=cart();const total=cartTotalValue();if(!Object.keys(items).length){alert('კალათა ცარიელია');return}if(!user()){window.location.href='auth.html';return}const order={id:Date.now(),items,customer:user(),total,createdAt:new Date().toISOString()};const orders=J('borders','[]');orders.push(order);localStorage.setItem('borders',JSON.stringify(orders));localStorage.setItem('bcart',JSON.stringify({}));counts();drawCart();alert('თქვენი შეკვეთა მიღებულია!');closeCart()}
+function bindMenuUI(){const q=document.getElementById('q');const burger=document.getElementById('burgerBtn');const nav=document.getElementById('navMenu');const themeBtn=document.getElementById('themeToggle');const cats=document.getElementById('bcats');const theme=localStorage.getItem('btheme')==='dark';document.body.classList.toggle('dark',theme);if(themeBtn)themeBtn.textContent=theme?'☀️':'🌙';if(q)q.addEventListener('input',draw);if(burger)burger.addEventListener('click',()=>nav&&nav.classList.toggle('open'));if(themeBtn)themeBtn.addEventListener('click',()=>{const dark=document.body.classList.toggle('dark');localStorage.setItem('btheme',dark?'dark':'light');themeBtn.textContent=dark?'☀️':'🌙'});if(cats){cats.innerHTML=Object.entries(CATS).map(([key,label])=>`<button class="chip ${cat===key?'active':''}" data-cat="${key}">${label}</button>`).join('');cats.querySelectorAll('button[data-cat]').forEach(btn=>btn.addEventListener('click',()=>{cat=btn.dataset.cat;draw();bindMenuUI();}))}}
+window.addEventListener('DOMContentLoaded',()=>{bindMenuUI();counts();draw();drawCart()});
 </script>
-
-</body>
-</html>

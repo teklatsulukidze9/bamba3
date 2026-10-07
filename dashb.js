@@ -47,6 +47,41 @@ function updateStats() {
       : '0.00'} ₾`;
 }
 
+async function loadMessages() {
+  const box = $('#adminMessages');
+
+  try {
+    const r = await secure(`${API}/messages`);
+
+    if (!r.ok) {
+      throw new Error('Messages could not be loaded');
+    }
+
+    const messages = await r.json();
+
+    if (!Array.isArray(messages)) {
+      throw new Error('Invalid messages response');
+    }
+
+    $('#messageCount').textContent = messages.length;
+    $('#messageBadge').textContent = messages.length;
+    box.innerHTML = messages.length
+      ? messages.map(message => `
+        <article class="message-card">
+          <strong>${escapeHtml(message.name || 'მომხმარებელი')}</strong>
+          <small>${escapeHtml(message.email || '')}</small>
+          <p>${escapeHtml(message.message || '')}</p>
+        </article>
+      `).join('')
+      : '<div class="empty-state">შეტყობინებები ჯერ არ არის.</div>';
+  } catch (e) {
+    if (e.message !== 'Unauthorized') {
+      box.innerHTML =
+        '<div class="empty-state">⚠️ შეტყობინებების ჩატვირთვა ვერ მოხერხდა.</div>';
+    }
+  }
+}
+
 function render(data) {
   const box = $('#adminMenuList');
 
@@ -269,8 +304,46 @@ $('#addDishForm').onsubmit = async e => {
   }
 };
 
-loadMenu();
+$('#logoutBtn').addEventListener('click', async event => {
+  const button = event.currentTarget;
+  button.disabled = true;
 
-if (typeof loadMessages === 'function') {
-  loadMessages();
-}
+  try {
+    const r = await secure(`${API}/auth`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ logout: true })
+    });
+
+    if (!r.ok) {
+      throw new Error('Logout failed');
+    }
+
+    location.replace('admin-login.html');
+  } catch (e) {
+    if (e.message !== 'Unauthorized') {
+      alert('❌ სისტემიდან გასვლა ვერ მოხერხდა.');
+      button.disabled = false;
+    }
+  }
+});
+
+const navMenu = $('#navMenu');
+$('#burgerBtn').addEventListener('click', () => {
+  navMenu.classList.toggle('open');
+});
+
+const themeButton = $('#themeToggle');
+const darkTheme = localStorage.getItem('btheme') === 'dark';
+document.body.classList.toggle('dark', darkTheme);
+themeButton.textContent = darkTheme ? '☀️' : '🌙';
+themeButton.addEventListener('click', () => {
+  const dark = document.body.classList.toggle('dark');
+  localStorage.setItem('btheme', dark ? 'dark' : 'light');
+  themeButton.textContent = dark ? '☀️' : '🌙';
+});
+
+loadMenu();
+loadMessages();
