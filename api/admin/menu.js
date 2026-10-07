@@ -23,6 +23,7 @@ function session(req) {
       .digest('base64url');
 
     if (
+      !sig ||
       sig.length !== exp.length ||
       !crypto.timingSafeEqual(
         Buffer.from(sig),
@@ -42,28 +43,17 @@ function session(req) {
   }
 }
 
-function isValidDish(item) {
-  if (!item || typeof item !== 'object') return false;
-
-  const name = String(item.n || '').trim();
-
-  // Ignore broken placeholder records such as:
-  // n 1, n 2, n 3...
-  if (!name) return false;
-  if (/^n\s*\d+$/i.test(name)) return false;
-
-  return true;
-}
-
 module.exports = async (req, res) => {
   if (!process.env.ADMIN_SECRET) {
-    return res
-      .status(500)
-      .json({ error: 'Admin environment is not configured' });
+    return res.status(500).json({
+      error: 'Admin environment is not configured'
+    });
   }
 
   if (!session(req)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({
+      error: 'Unauthorized'
+    });
   }
 
   const id = req.query?.id;
@@ -91,27 +81,27 @@ module.exports = async (req, res) => {
     const r = await fetch(url, options);
     const text = await r.text();
 
+    if (!text.trim()) {
+      return res.status(r.status).json([]);
+    }
+
     let data;
 
     try {
       data = JSON.parse(text);
     } catch {
-      data = {};
+      return res.status(502).json({
+        error: 'Invalid response from MockAPI'
+      });
     }
 
-    // Filter broken placeholder records when loading the menu.
-    if (req.method === 'GET' && !id && Array.isArray(data)) {
-      data = data.filter(isValidDish);
-    }
+    res.status(r.status).json(data);
 
-    res
-      .status(r.status)
-      .setHeader('Content-Type', 'application/json');
+  } catch (error) {
+    console.error(error);
 
-    res.send(JSON.stringify(data));
-  } catch {
-    res
-      .status(502)
-      .json({ error: 'API connection failed' });
+    res.status(502).json({
+      error: 'API connection failed'
+    });
   }
 };

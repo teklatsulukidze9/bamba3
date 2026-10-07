@@ -92,28 +92,175 @@ async function initFav(){
   });
   draw();
 }
-window.handleCheckout=()=>{
-  const c=bcart();
-  if(!Object.keys(c).length)return alert('კალათა ცარიელია.');
-  const name=prompt('შეიყვანე სახელი შეკვეთისთვის:');
-  if(!name)return;
-  alert(`გმადლობთ, ${name}! თქვენი შეკვეთა მიღებულია.`);
-  localStorage.removeItem('bcart');updateCounts();initCart();
-};
-function common(){
-  updateCounts();
-  const t=$('#themeToggle');
-  if(t){
-    const dark=localStorage.getItem('theme')==='dark';
-    document.body.classList.toggle('dark',dark);t.textContent=dark?'☀️':'🌙';
-    t.onclick=()=>{const x=document.body.classList.toggle('dark');localStorage.setItem('theme',x?'dark':'light');t.textContent=x?'☀️':'🌙';};
+
+window.handleCheckout = () => {
+  const c = bcart();
+
+  if (!Object.keys(c).length) {
+    alert('კალათა ცარიელია.');
+    return;
   }
-  const b=$('#burgerBtn'),n=$('#navMenu');
-  b?.addEventListener('click',()=>n?.classList.toggle('open'));
-}
-document.addEventListener('DOMContentLoaded',()=>{
-  common();
-  if($('#menuGrid')||$('#bgrid'))initBamba();
-  if($('#bcart'))initCart();
-  if($('#favGrid'))initFav();
-});
+const user = JSON.parse(
+  localStorage.getItem('customer') || 'null'
+);
+
+  if (!user) {
+    const goLogin = confirm(
+      'შეკვეთის გასაკეთებლად საჭიროა ავტორიზაცია.\n\nგსურთ შესვლის გვერდზე გადასვლა?'
+    );
+
+    if (goLogin) {
+      window.location.href = 'auth.html';
+    }
+
+    return;
+  }
+
+  const oldModal = document.getElementById('checkoutModal');
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'checkoutModal';
+
+  modal.innerHTML = `
+    <div class="checkout-overlay">
+      <div class="checkout-box">
+        <button class="checkout-close" id="checkoutClose">×</button>
+
+        <div class="section-head left">
+          <span>CHECKOUT</span>
+          <h2>შეკვეთის გაფორმება</h2>
+        </div>
+
+        <form id="checkoutForm">
+          <div class="checkout-field">
+            <label for="checkoutFirstName">სახელი *</label>
+            <input
+              type="text"
+              id="checkoutFirstName"
+              name="firstName"
+              placeholder="შეიყვანე სახელი"
+              autocomplete="given-name"
+              required
+            >
+          </div>
+
+          <div class="checkout-field">
+            <label for="checkoutLastName">გვარი *</label>
+            <input
+              type="text"
+              id="checkoutLastName"
+              name="lastName"
+              placeholder="შეიყვანე გვარი"
+              autocomplete="family-name"
+              required
+            >
+          </div>
+
+          <div class="checkout-field">
+            <label for="checkoutPhone">ტელეფონის ნომერი *</label>
+            <input
+              type="tel"
+              id="checkoutPhone"
+              name="phone"
+              placeholder="+995 5XX XX XX XX"
+              autocomplete="tel"
+              required
+            >
+          </div>
+
+          <div class="checkout-field">
+            <label for="checkoutEmail">ელფოსტა *</label>
+            <input
+              type="email"
+              id="checkoutEmail"
+              name="email"
+              placeholder="example@email.com"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div id="checkoutError" class="checkout-error"></div>
+
+          <button type="submit" class="btn-main checkout-submit">
+            შეკვეთის დადასტურება
+          </button>
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const close = () => modal.remove();
+
+  document.getElementById('checkoutClose')?.addEventListener('click', close);
+
+  modal.querySelector('.checkout-overlay')?.addEventListener('click', e => {
+    if (e.target instanceof HTMLElement && e.target.classList.contains('checkout-overlay')) {
+      close();
+    }
+  });
+
+  document.getElementById('checkoutForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const form = e.target;
+    const error = document.getElementById('checkoutError');
+
+    if (!form || !error) return;
+
+    const firstName = String(form.firstName?.value || '').trim();
+    const lastName = String(form.lastName?.value || '').trim();
+    const phone = String(form.phone?.value || '').trim();
+    const email = String(form.email?.value || '').trim();
+
+    error.textContent = '';
+
+    if (!firstName || !lastName || !phone || !email) {
+      error.textContent = 'გთხოვ, შეავსე ყველა აუცილებელი ველი.';
+      return;
+    }
+
+    if (firstName.length < 2 || lastName.length < 2) {
+      error.textContent = 'სახელი და გვარი უნდა შეიცავდეს მინიმუმ 2 სიმბოლოს.';
+      return;
+    }
+
+    const phoneRegex = /^\+?[0-9\s()-]{9,20}$/;
+
+    if (!phoneRegex.test(phone)) {
+      error.textContent = 'გთხოვ, შეიყვანე სწორი ტელეფონის ნომერი.';
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      error.textContent = 'გთხოვ, შეიყვანე სწორი ელფოსტის მისამართი.';
+      return;
+    }
+
+    const submit = form.querySelector('button[type="submit"]');
+
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = 'იგზავნება...';
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    localStorage.removeItem('bcart');
+    updateCounts();
+    modal.remove();
+
+    alert(
+      `შეკვეთა წარმატებით გაიგზავნა! 🎉\n\n` +
+        `${firstName} ${lastName}, გმადლობთ შეკვეთისთვის.`
+    );
+
+    initCart();
+  });
+};
+

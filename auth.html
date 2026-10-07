@@ -1,1 +1,147 @@
-<!DOCTYPE html><html lang="ka"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bamba • შესვლა</title><link rel="stylesheet" href="style.css"></head><body><header><div class="nav-container"><a href="index.html" class="logo">Bamba <span>•</span></a><button class="burger" id="burgerBtn">☰</button><nav id="navMenu"><a href="index.html" class="">მთავარი</a><a href="menu.html" class="">მენიუ</a><a href="cart.html" class="">კალათა (<span id="cartCount">0</span>)</a><a href="favorite.html" class="">ფავორიტები (<span id="favCount">0</span>)</a><a href="contactus.html" class="contact-link">კონტაქტი</a><a href="auth.html" class="active" id="authLink">შესვლა</a></nav><button id="themeToggle" class="theme-btn">🌙</button></div></header><main class="container page narrow"><div class="form-card"><span class="eyebrow">BAMBA</span><h1>მომხმარებლის შესვლა</h1><p class="muted">შეინახე შენი სახელი შეკვეთებისთვის.</p><form id="userForm"><input id="userName" placeholder="სახელი" required><input id="userEmail" type="email" placeholder="ელ-ფოსტა" required><button class="btn-main">შესვლა</button></form></div></main><footer><div class="container"><strong>Bamba</strong><p>კლასიკური გემოები და თანამედროვე კომფორტი.</p><small>© 2026 Bamba Restaurant</small></div></footer><script src="bamba.js"></script><script>userForm.onsubmit=e=>{e.preventDefault();localStorage.setItem('customer',JSON.stringify({name:userName.value,email:userEmail.value}));alert('კეთილი იყოს შენი მობრძანება, '+userName.value+'!');location.href='index.html'};</script></body></html>
+```html
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bamba • შესვლა</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="nav-container">
+    <a href="index.html" class="logo">
+      Bamba <span>•</span>
+    </a>
+
+    <button class="burger" id="burgerBtn">☰</button>
+
+    <nav id="navMenu">
+      <a href="index.html">მთავარი</a>
+      <a href="menu.html">მენიუ</a>
+      <a href="cart.html">
+        კალათა (<span id="cartCount">0</span>)
+      </a>
+      <a href="favorite.html">
+        ფავორიტები (<span id="favCount">0</span>)
+      </a>
+      <a href="contactus.html" class="contact-link">კონტაქტი</a>
+      <a href="auth.html" class="active" id="authLink">შესვლა</a>
+    </nav>
+
+    <button id="themeToggle" class="theme-btn">🌙</button>
+  </div>
+</header>
+
+<main class="container page narrow">
+
+  <div class="form-card">
+
+    <span class="eyebrow">BAMBA</span>
+
+    <h1>მომხმარებლის შესვლა</h1>
+
+    <p class="muted">
+      შეიყვანე შენი მონაცემები შეკვეთის გასაფორმებლად.
+    </p>
+
+    <form id="userForm">
+
+      <input
+        id="userName"
+        type="text"
+        placeholder="სახელი"
+        autocomplete="given-name"
+        required
+      >
+
+      <input
+        id="userLastName"
+        type="text"
+        placeholder="გვარი"
+        autocomplete="family-name"
+        required
+      >
+
+      <input
+        id="userPhone"
+        type="tel"
+        placeholder="ტელეფონის ნომერი"
+        autocomplete="tel"
+        required
+      >
+
+      <input
+        id="userEmail"
+        type="email"
+        placeholder="ელ-ფოსტა"
+        autocomplete="email"
+        required
+      >
+
+      <button type="submit" class="btn-main">
+        შესვლა
+      </button>
+
+    </form>
+
+  </div>
+
+</main>
+
+<footer>
+  <div class="container">
+    <strong>Bamba</strong>
+    <p>კლასიკური გემოები და თანამედროვე კომფორტი.</p>
+    <small>© 2026 Bamba Restaurant</small>
+  </div>
+</footer>
+
+<script src="bamba.js"></script>
+
+<script>
+  const userForm = document.getElementById('userForm');
+
+  userForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const name = document.getElementById('userName').value.trim();
+    const lastName = document.getElementById('userLastName').value.trim();
+    const phone = document.getElementById('userPhone').value.trim();
+    const email = document.getElementById('userEmail').value.trim();
+
+    if (!name || !lastName || !phone || !email) {
+      alert('გთხოვ, შეავსე ყველა ველი.');
+      return;
+    }
+
+    const phoneRegex = /^\+?[0-9\s()-]{9,20}$/;
+
+    if (!phoneRegex.test(phone)) {
+      alert('გთხოვ, შეიყვანე სწორი ტელეფონის ნომერი.');
+      return;
+    }
+
+    const customer = {
+      name,
+      lastName,
+      phone,
+      email
+    };
+
+    localStorage.setItem(
+      'customer',
+      JSON.stringify(customer)
+    );
+
+    alert(`კეთილი იყოს შენი მობრძანება, ${name}! ❤️`);
+
+    location.href = 'index.html';
+  });
+</script>
+
+</body>
+</html>
+```
