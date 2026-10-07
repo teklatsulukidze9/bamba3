@@ -59,7 +59,37 @@
 </footer>
 
 <script src="bamba-data.js"></script>
-<script src="bamba.js"></script>
+
+<script>
+const grid = document.getElementById("menuGrid");
+const search = document.getElementById("menuSearch");
+
+function showMenu(items) {
+  grid.innerHTML = items.map(item => `
+    <article class="menu-card">
+      <img src="${item.i || item.img || ''}" alt="${item.e || item.n || 'Bamba'}">
+      <div class="menu-card-content">
+        <h3>${item.e || item.n || ''}</h3>
+        <p>${item.n || ''}</p>
+        <strong>${item.p || 0} ₾</strong>
+      </div>
+    </article>
+  `).join("");
+}
+
+showMenu(typeof BMENU !== "undefined" ? BMENU : []);
+
+search.addEventListener("input", () => {
+  const q = search.value.toLowerCase().trim();
+
+  const filtered = BMENU.filter(item =>
+    (item.e || "").toLowerCase().includes(q) ||
+    (item.n || "").toLowerCase().includes(q)
+  );
+
+  showMenu(filtered);
+});
+</script>
 
 </body>
 </html>
