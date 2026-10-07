@@ -1,1 +1,65 @@
-<!DOCTYPE html><html lang="ka"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bamba • მენიუ</title><link rel="stylesheet" href="style.css"></head><body><header><div class="nav-container"><a href="index.html" class="logo">Bamba <span>•</span></a><button class="burger" id="burgerBtn">☰</button><nav id="navMenu"><a href="index.html" class="">მთავარი</a><a href="menu.html" class="active">მენიუ</a><a href="cart.html" class="">კალათა (<span id="cartCount">0</span>)</a><a href="favorite.html" class="">ფავორიტები (<span id="favCount">0</span>)</a><a href="contactus.html" class="contact-link">კონტაქტი</a><a href="auth.html" class="" id="authLink">შესვლა</a></nav><button id="themeToggle" class="theme-btn">🌙</button></div></header><main class="container page"><div class="section-head"><span>OUR MENU</span><h1>ჩვენი მენიუ</h1><p>აირჩიე შენი საყვარელი გემო.</p></div><div class="menu-tools"><input id="q" placeholder="🔎 მოძებნე კერძი..."><div id="bcats" class="filter-bar"></div></div><div id="menuGrid" class="cards-grid"></div></main><footer><div class="container"><strong>Bamba</strong><p>კლასიკური გემოები და თანამედროვე კომფორტი.</p><small>© 2026 Bamba Restaurant</small></div></footer><script src="bamba-data.js"></script><script src="bamba.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bamba • მენიუ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="nav-container">
+    <a href="index.html" class="logo">Bamba <span>•</span></a>
+
+    <button class="burger" id="burgerBtn">☰</button>
+
+    <nav id="navMenu">
+      <a href="index.html">მთავარი</a>
+      <a href="menu.html" class="active">მენიუ</a>
+      <a href="cart.html">კალათა (<span id="cartCount">0</span>)</a>
+      <a href="favorite.html">ფავორიტები (<span id="favCount">0</span>)</a>
+      <a href="contactus.html" class="contact-link">კონტაქტი</a>
+      <a href="auth.html" id="authLink">შესვლა</a>
+    </nav>
+
+    <button id="themeToggle" class="theme-btn">🌙</button>
+  </div>
+</header>
+
+<main class="container page">
+
+  <div class="page-head">
+    <span class="eyebrow">BAMBA</span>
+    <h1>ჩვენი მენიუ</h1>
+    <p class="muted">აღმოაჩინე Bamba-ს საყვარელი კერძები.</p>
+  </div>
+
+  <div id="bcats" class="category-filters"></div>
+
+  <div class="search-box">
+    <input
+      type="search"
+      id="menuSearch"
+      placeholder="მოძებნე კერძი..."
+    >
+  </div>
+
+  <section id="menuGrid" class="grid"></section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <strong>Bamba</strong>
+    <p>კლასიკური გემოები და თანამედროვე კომფორტი.</p>
+    <small>© 2026 Bamba Restaurant</small>
+  </div>
+</footer>
+
+<script src="bamba-data.js"></script>
+<script src="bamba.js"></script>
+
+</body>
+</html>
